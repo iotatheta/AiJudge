@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Judge</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.0/css/bootstrap.min.css">
+  <style>
+    /* General Styles */
+    body {
+      background-color: #d8b4f1;
+      font-family: 'Arial', sans-serif;
+      color: #000;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Header Section */
+    header {
+      width: 100%;
+      background-color: #9a74d0;
+      padding: 20px 10px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+
+    header img {
+      max-width: 100px;
+      border-radius: 50%;
+      margin: 10px 0;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 80vw;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .container h2 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    /* Form Section */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Analyze Button */
+    .analyze-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: #6a1b9a;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    .analyze-btn:hover {
+      background-color: #4a148c;
+    }
+
+    /* Result Section */
+    .result {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .chart-container {
+      display: flex;
+      flex-flow: wrap;
+      /* justify-content: space-between; */
+      gap: 20px;
+    }
+
+    .chart-box {
+      width: 30%;
+      min-width: 250px;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      padding: 10px 0;
+      background-color: #9a74d0;
+      color: #fff;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      .chart-box {
+        width: 100%;
+      }
+
+      .analyze-btn {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Judge</h1>
+    <img src="logo.jpeg" alt="AI Judge Logo">
+  </header>
+
+  <div class="container">
+    <h2>Case Analysis</h2>
+    <div class="form-group">
+      <label for="caseType">Case Type</label>
+      <select id="caseType" class="form-control">
+        <option value="divorce">Divorce</option>
+        <option value="civil">Civil</option>
+        <option value="criminal">Criminal</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="caseFile">Upload Case File</label>
+      <input type="file" id="caseFile" class="form-control">
+    </div>
+
+    <button class="analyze-btn" onclick="analyzeCase()">Analyze</button>
+
+    <div class="result" id="result" style="display: none;">
+      <h3>Analysis Result</h3>
+      <h4><i>Predicted chances of winning</i></h4>
+      <div class="chart-container">
+        <!-- Pie Chart -->
+        <div class="chart-box">
+          <h4>Pie Chart</h4>
+          <canvas id="pieChart"></canvas>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="chart-box">
+          <h4>Radar Chart</h4>
+          <canvas id="radarChart"></canvas>
+        </div>
+
+        <!-- Gauge Chart -->
+        <div class="chart-box">
+          <h4>Line Chart</h4>
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with ❤️ for Lawyers and Clients
+    <h6 style="color: #000;">Copyright &copy; AI Judge</h6>
+  </footer>
+
+  <script>
+    function analyzeCase() {
+      const result = document.getElementById('result');
+      result.style.display = 'block';
+
+      // Render all charts with random data
+      renderPieChart();
+      renderRadarChart();
+      renderLineChart();
+    }
+
+    function renderPieChart() {
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Win', 'Lose'],
+          datasets: [{
+            data: [Math.random() * 100, Math.random() * 100],
+            backgroundColor: ['#36a2eb', '#ff6384'],
+          }],
+        },
+      });
+    }
+
+    function renderRadarChart() {
+      const ctx = document.getElementById('radarChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: ['Evidence', 'Argument Strength', 'Law Knowledge', 'Witness'],
+          datasets: [{
+            label: 'Case Strength',
+            data: [Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: '#36a2eb',
+            borderWidth: 1,
+          }],
+        },
+      });
+    }
+
+    function renderLineChart() {
+        var ctxLine = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['Evidence', 'Argument Strength', 'Law Knowledge', 'Witness'],
+                    datasets: [{
+                        label: 'Case Strength',
+                        data: [Math.random() * 10, Math.random() * 10, Math.random() * 10, Math.random() * 10],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false,
+                    }]
+                }
+            });
+    }
+  </script>
+</body>
+</html>
